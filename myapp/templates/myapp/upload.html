@@ -16,11 +16,12 @@
                     </div>
                     <div class="card-body">
                         <form method="post" enctype="multipart/form-data" action="{% url 'handle_file_upload' %}" class="text-center">
-                            {% csrf_token %}
+                         <!--  protect from phishing in django -->
+                            {% csrf_token %}  
                             <div class="mb-3">
                                 <label for="{{ form.file.id_for_label }}" class="form-label">{{ form.file.label }}</label>
                                 <input type="{{ form.file.field.widget.input_type }}" 
-                                       name="{{ form.file.name }}" 
+                                       name="uploaded_file" 
                                        class="form-control" 
                                        id="{{ form.file.id_for_label }}"
                                        {% if form.file.field.required %}required{% endif %}>

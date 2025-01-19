@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Results Page</h2>
+    <p>Your predictions are ready for download.</p>
+    
+    <a href="{% url 'download_predictions' %}">Download Predictions</a>
+
+   <img src="data:image/png;base64,{{ cm_image }}" alt="Confusion Matrix">
+   
+<img src="data:image/png;base64,{{ roc_image }}" alt="ROC Curve">
+
+<img src="data:image/png;base64,{{ cv_image }}" alt="Cross-validation scores">
+<h3>Model Evaluation</h3>
+<p>Accuracy: {{ accuracy }}</p>
+
+<h4>Classification Report</h4>
+<table border="1">
+    <tr>
+        <th>Class</th>
+        <th>Precision</th>
+        <th>Recall</th>
+        <th>F1-Score</th>
+    </tr>
+    {% for label, values in report.items %}
+        <tr>
+            <td>{{ label }}</td>
+            <td>{{ values.precision|floatformat:2 }}</td>
+            <td>{{ values.recall|floatformat:2 }}</td>
+            <td>{{ values.f1_score|floatformat:2 }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+</body>
+</html>
