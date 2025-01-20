@@ -7,10 +7,10 @@ import csv
 from django.utils.encoding import smart_str
 import numpy as np
 
-# Load model and data once at startup
-rf, y_test, y_pred, y_prob, cv_scores = load_model()
+# Load RandomForest model and its results once at startup
+rf, y_test, y_pred, y_prob, cv_scores = load_model("finalized_randomForest.sav")
 
-# Precompute images and store them globally
+# Precompute images and store them globally for RandomForest
 classes = np.unique(y_test)
 cm_image = generate_confusion_matrix(y_test, y_pred)
 roc_image = generate_roc_curve(y_test, y_prob, classes)
@@ -25,7 +25,8 @@ def render_upload_form(request):
     return render(request, 'myapp/upload.html', {'form': form})
 
 def handle_file_upload(request):
-    uploaded_file = request.FILES.get('uploaded_file')
+    model= request.POST.get('model').strip()
+    uploaded_file = request.FILES.get('file')
     if uploaded_file:
         file_extension = uploaded_file.name.split('.')[-1].lower()
         if file_extension == 'csv':
@@ -37,9 +38,9 @@ def handle_file_upload(request):
 
         if 'Class' in df.columns:
             df = df.drop('Class', axis=1)
-
-        # Make predictions on the data
-        predictions = rf.predict(df)
+        if model == 'rf':
+            # Make predictions using the random forest model (or any future model)
+            predictions = rf.predict(df)  # change this to another model's prediction later if needed
         df['Class'] = predictions
 
         # Prepare the file for download
@@ -72,6 +73,10 @@ def download_predictions(request):
     if predicted_data:
         response = HttpResponse(predicted_data, content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="predictions_{uploaded_filename}"'
+
+        # Clear session data after download
+        request.session.pop('predicted_data', None)
+        request.session.pop('uploaded_filename', None)
         return response
     else:
         return HttpResponse("No predictions available", status=404)

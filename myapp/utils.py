@@ -6,10 +6,12 @@ import pandas as pd
 from io import BytesIO
 import base64
 from sklearn.metrics import confusion_matrix, roc_curve, auc, classification_report, accuracy_score
+import matplotlib
+matplotlib.use('Agg')
 
-# Load model & stored test results once at startup
-def load_model():
-    model_data = joblib.load("finalized_randomForest.sav")
+# Load model & stored test results once at startup (adjustable for different models)
+def load_model(model_name="finalized_randomForest.sav"):
+    model_data = joblib.load(model_name)
     return model_data["model"], model_data["y_test"], model_data["y_pred"], model_data["y_prob"], model_data["cv_scores"]
 
 # Clean the classification report
@@ -27,7 +29,7 @@ def generate_model_metrics(y_test, y_pred):
     accuracy = report.get('accuracy', acc)
     return accuracy, report
 
-# Generate cross-validation plot
+# Generate cross-validation plot (same for any model)
 def generate_cross_val_plot(cv_scores):
     plt.figure(figsize=(6, 4))
     plt.plot(range(1, len(cv_scores) + 1), cv_scores, marker='o', linestyle='--', color='b')
@@ -38,7 +40,7 @@ def generate_cross_val_plot(cv_scores):
     plt.grid(True)
     return save_plot_to_base64()
 
-# Generate confusion matrix plot
+# Generate confusion matrix plot (same for any model)
 def generate_confusion_matrix(y_test, y_pred):
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(6, 4))
@@ -47,7 +49,7 @@ def generate_confusion_matrix(y_test, y_pred):
     plt.ylabel("Actual")
     return save_plot_to_base64()
 
-# Generate ROC curve plot
+# Generate ROC curve plot (same for any model)
 def generate_roc_curve(y_test, y_prob, classes):
     plt.figure(figsize=(6, 4))
     for i in classes:
